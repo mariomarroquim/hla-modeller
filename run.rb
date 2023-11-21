@@ -6,7 +6,7 @@ allele_sequences = {}
 skip_line = false
 
 ALLOWED_LOCI = %w[A B C DRB1 DRB3 DRB4 DRB5 DQA1 DQB1 DPA1 DPB1]
-ESM_TIMEOUT = 32
+ESM_TIMEOUT = 16
 
 unless File.exist?(allele_sequences_file)
   system('wget', "https://raw.githubusercontent.com/ANHIG/IMGTHLA/Latest/#{allele_sequences_file}")
@@ -112,11 +112,15 @@ pool = Concurrent::FixedThreadPool.new(Concurrent.processor_count)
 
 filtered_allele_sequences.each do |allele, sequence|
   pool.post do
-    `mkdir -p output/HLA_#{allele.split('*').first}`
+    output_folder = "output/HLA_#{allele.split('*').first}"
+    model_name = "#{allele.gsub('*', '_').gsub(':', '_')}.pdb"
 
-    `curl -X POST -s --connect-timeout #{ESM_TIMEOUT} --data "#{sequence}" https://api.esmatlas.com/foldSequence/v1/pdb/ > output/HLA_#{allele.split('*').first}/#{allele.gsub('*', '_').gsub(
-      ':', '_'
-    )}.pdb`
+    `mkdir -p #{output_folder}`
+
+    puts "[#{Time.current}] Running: curl -X POST -s --insecure --connect-timeout #{ESM_TIMEOUT} --data \"#{sequence}\" https://api.esmatlas.com/foldSequence/v1/pdb/ > #{output_folder}/#{model_name}"
+
+    `curl -X POST -s --insecure --connect-timeout #{ESM_TIMEOUT} --data "#{sequence}" https://api.esmatlas.com/foldSequence/v1/pdb/ > #{output_folder}/#{model_name}`
+
     sleep ESM_TIMEOUT
   end
 end
