@@ -1,6 +1,6 @@
 # HLA Modeller
 
-This script generates 3D models of HLA molecules using ESMFold (https://esmatlas.com) with data from the latest IPD-IMGT/HLA (https://www.ebi.ac.uk/ipd/imgt/hla). For research use only. Not for diagnostic purposes.
+This script generates 3D models of HLA molecules using Meta's ESMFold (https://esmatlas.com) with data from the latest IPD-IMGT/HLA (https://www.ebi.ac.uk/ipd/imgt/hla). For research use only. Not for diagnostic purposes.
 
 ## Instructions
 
