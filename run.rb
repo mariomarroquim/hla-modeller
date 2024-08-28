@@ -5,7 +5,7 @@ current_allele_name = nil
 allele_sequences = {}
 skip_line = false
 
-ALLOWED_LOCI = %w[A B C DRB1 DRB3 DRB4 DRB5 DQA1 DQB1 DPA1 DPB1]
+ALLOWED_LOCI = %w[DRB1 DRB3 DRB4 DRB5 DQA1 DQB1 DPA1 DPB1]
 ESM_TIMEOUT = 16
 
 unless File.exist?(allele_sequences_file)
@@ -44,32 +44,18 @@ File.delete(allele_sequences_file)
 
 puts "DOWNLOADED ALLELES QTD: #{allele_sequences.size}"
 
-signal_peptide_sizes = {
-  'A' => 24,
-  'B' => 24,
-  'C' => 24,
-  'DRB1' => 29,
-  'DRB3' => 29,
-  'DRB4' => 29,
-  'DRB5' => 29,
-  'DQA1' => 23,
-  'DQB1' => 32,
-  'DPA1' => 31,
-  'DPB1' => 29
-}
-
-mature_sequence_sizes = {
-  'A' => 274,
-  'B' => 276,
-  'C' => 274,
-  'DRB1' => 190,
-  'DRB3' => 190,
-  'DRB4' => 190,
-  'DRB5' => 190,
-  'DQA1' => 183,
-  'DQB1' => 189,
-  'DPA1' => 181,
-  'DPB1' => 189
+min_sequence_sizes = {
+  'A' => 270,
+  'B' => 270,
+  'C' => 270,
+  'DRB1' => 180,
+  'DRB3' => 180,
+  'DRB4' => 180,
+  'DRB5' => 180,
+  'DQA1' => 180,
+  'DQB1' => 180,
+  'DPA1' => 180,
+  'DPB1' => 180
 }
 
 filtered_allele_sequences = {}
@@ -77,17 +63,9 @@ filtered_allele_sequences = {}
 allele_sequences.each do |allele, sequence|
   locus = allele.split('*').first
 
-  if sequence.size < mature_sequence_sizes[locus]
-    next
+  next if sequence.size < min_sequence_sizes[locus]
 
-  elsif (sequence.size + signal_peptide_sizes[locus]) >= mature_sequence_sizes[locus]
-    mature_sequence = sequence[signal_peptide_sizes[locus]...(mature_sequence_sizes[locus] + signal_peptide_sizes[locus])]
-
-  else
-    mature_sequence = sequence[0...(mature_sequence_sizes[locus] - 1)]
-  end
-
-  filtered_allele_sequences[allele] = mature_sequence
+  filtered_allele_sequences[allele] = sequence
 end
 
 puts "FILTERED ALLELES QTD: #{filtered_allele_sequences.size}"
@@ -117,7 +95,7 @@ filtered_allele_sequences.each do |allele, sequence|
 
     `mkdir -p #{output_folder}`
 
-    puts "[#{Time.current}] Running: curl -X POST -s --insecure --connect-timeout #{ESM_TIMEOUT} --data \"#{sequence}\" https://api.esmatlas.com/foldSequence/v1/pdb/ > #{output_folder}/#{model_name}"
+    puts "[#{Time.now}] Running: curl -X POST -s --insecure --connect-timeout #{ESM_TIMEOUT} --data \"#{sequence}\" https://api.esmatlas.com/foldSequence/v1/pdb/ > #{output_folder}/#{model_name}"
 
     `curl -X POST -s --insecure --connect-timeout #{ESM_TIMEOUT} --data "#{sequence}" https://api.esmatlas.com/foldSequence/v1/pdb/ > #{output_folder}/#{model_name}`
 

@@ -4,7 +4,7 @@ This script generates 3D models of HLA molecules using Meta's ESMFold (https://e
 
 ## Instructions
 
-Current HLA models are in the `output` folder. Of the 21,132 HLA sequences available at the latest (late 2023) IPD-IMGT/HLA release, 11,040 had the expected length (regarding a reference mature HLA protein of the same locus) and were used to generate the models. To generate models for a newer IPD-IMGT/HLA release, run `ruby run.rb`.
+Current HLA models are in the `output` folder. Of the 22,308 HLA sequences available at the latest (as of 2024-08-26) IPD-IMGT/HLA release, 14,566 had the expected length (regarding a reference mature HLA protein of the same locus) and were used to generate the models. To generate models for a newer IPD-IMGT/HLA release, run `ruby run.rb`.
 
 ## Support
 
