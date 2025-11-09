@@ -89,10 +89,13 @@ puts "MODELING WHAT IS POSSIBLE USING #{Concurrent.processor_count} THREADS..."
 pool = Concurrent::FixedThreadPool.new(Concurrent.processor_count)
 
 filtered_allele_sequences.each do |allele, sequence|
-  pool.post do
-    output_folder = "output/HLA_#{allele.split('*').first}"
-    model_name = "#{allele.gsub('*', '_').gsub(':', '_')}.pdb"
+  output_folder = "output/HLA_#{allele.split('*').first}"
+  model_name = "#{allele.gsub('*', '_').gsub(':', '_')}.pdb"
 
+  next if File.exist?("#{output_folder}/#{model_name}") && File.size("#{output_folder}/#{model_name}") > 0
+  `rm -f #{output_folder}/#{model_name}` if File.exist?("#{output_folder}/#{model_name}")
+  
+  pool.post do
     `mkdir -p #{output_folder}`
 
     puts "[#{Time.now}] Running: curl -X POST -s --insecure --connect-timeout #{ESM_TIMEOUT} --data \"#{sequence}\" https://api.esmatlas.com/foldSequence/v1/pdb/ > #{output_folder}/#{model_name}"
