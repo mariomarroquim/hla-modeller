@@ -5,8 +5,10 @@ current_allele_name = nil
 allele_sequences = {}
 skip_line = false
 
-ALLOWED_LOCI = %w[DRB1 DRB3 DRB4 DRB5 DQA1 DQB1 DPA1 DPB1]
-ESM_TIMEOUT = 16
+TARGET_LOCI = %w[A B C DRB1 DRB3 DRB4 DRB5 DQA1 DQB1 DPA1 DPB1]
+TARGET_ALLELES = []
+ESM_MINIMAL_FILE_SIZE = 41
+ESM_TIMEOUT = 32
 
 unless File.exist?(allele_sequences_file)
   system('wget', "https://raw.githubusercontent.com/ANHIG/IMGTHLA/Latest/#{allele_sequences_file}")
@@ -22,12 +24,17 @@ File.open(allele_sequences_file).each_line do |line|
       next
     end
 
-    unless ALLOWED_LOCI.include?(current_locus)
+    if !TARGET_LOCI.empty? && !TARGET_LOCI.include?(current_locus)
       skip_line = true
       next
     end
 
     if current_allele_name[-1].match(/[A-Za-z]/)
+      skip_line = true
+      next
+    end
+
+    if !TARGET_ALLELES.empty? && !TARGET_ALLELES.include?(current_allele_name)
       skip_line = true
       next
     end
@@ -92,13 +99,13 @@ filtered_allele_sequences.each do |allele, sequence|
   output_folder = "output/HLA_#{allele.split('*').first}"
   model_name = "#{allele.gsub('*', '_').gsub(':', '_')}.pdb"
 
-  next if File.exist?("#{output_folder}/#{model_name}") && File.size("#{output_folder}/#{model_name}") > 0
+  next if File.exist?("#{output_folder}/#{model_name}") && File.size("#{output_folder}/#{model_name}") > ESM_MINIMAL_FILE_SIZE
   `rm -f #{output_folder}/#{model_name}` if File.exist?("#{output_folder}/#{model_name}")
-  
+
   pool.post do
     `mkdir -p #{output_folder}`
 
-    puts "[#{Time.now}] Running: curl -X POST -s --insecure --connect-timeout #{ESM_TIMEOUT} --data \"#{sequence}\" https://api.esmatlas.com/foldSequence/v1/pdb/ > #{output_folder}/#{model_name}"
+    # puts "[#{Time.now}] Running: curl -X POST -s --insecure --connect-timeout #{ESM_TIMEOUT} --data \"#{sequence}\" https://api.esmatlas.com/foldSequence/v1/pdb/ > #{output_folder}/#{model_name}"
 
     `curl -X POST -s --insecure --connect-timeout #{ESM_TIMEOUT} --data "#{sequence}" https://api.esmatlas.com/foldSequence/v1/pdb/ > #{output_folder}/#{model_name}`
 
