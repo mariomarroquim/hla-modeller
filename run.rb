@@ -48,6 +48,8 @@ File.open(allele_sequences_file).each_line do |line|
   end
 end
 
+File.delete(allele_sequences_file)
+
 puts "DOWNLOADED #{allele_sequences.size} ALLELES"
 
 signal_peptides_size = {
@@ -91,18 +93,18 @@ end
 
 puts "SELECTED #{filtered_allele_sequences.size} ALLELES"
 
-# output = File.new('input/sequences.fasta', 'w')
-# output.sync = true
-#
-# filtered_allele_sequences.each do |allele, sequence|
-#   output.puts ">#{allele}"
-#
-#   sequence.split('').each_slice(60) do |slice|
-#     output.puts slice.join
-#   end
-# end
-#
-# output.close
+output = File.new('input/sequences.fasta', 'w')
+output.sync = true
+
+filtered_allele_sequences.each do |allele, sequence|
+  output.puts ">#{allele}"
+
+  sequence.split('').each_slice(60) do |slice|
+    output.puts slice.join
+  end
+end
+
+output.close
 
 puts 'MODELING...'
 
