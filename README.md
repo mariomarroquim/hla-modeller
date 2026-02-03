@@ -4,7 +4,7 @@ This script generates 3D models of the most [common](https://www.ihiw18.org/comp
 
 ## Instructions
 
-Current models are in the [output](https://github.com/mariomarroquim/hla-modeller/tree/main/output) folder. To generate models for a newer IPD-IMGT/HLA release, run `ruby run.rb`. To view a model, download a PDB file from the output folder and use a visualizer, like [Molstar](https://molstar.org/viewer).
+Current models are in the [output](https://github.com/mariomarroquim/hla-modeller/tree/main/output) folder. To generate models for a newer IPD-IMGT/HLA release, run `ruby run.rb`. To view a model, download its PDB file from the output folder and use a visualizer, like [Molstar](https://molstar.org/viewer).
 
 ## Support
 
